@@ -1,16 +1,19 @@
 package com.thoughtworks.rslist;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
+import org.springframework.test.web.servlet.ResultMatcher;
+import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -20,20 +23,29 @@ public class RsControllerTest {
     MockMvc mockMvc;
     @Test
     void shouldGetRsList() throws Exception{
-        mockMvc.perform(get("/rs/list1"))
-                .andExpect(content().string("[第一条事件, 第二条事件, 第三条事件]"))
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
+                .andExpect(jsonPath("$[2].keyWord").value("无分类"))
                 .andExpect(status().isOk());
     }
     @Test
     void shouldGetOneEvent() throws Exception {
-        mockMvc.perform(get("/rs/1"))
-                .andExpect(content().string("第一条事件"))
+        mockMvc.perform(get("/rs/list/1"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.eventName").value("第一条事件"))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/2"))
-                .andExpect(content().string("第二条事件"))
+        mockMvc.perform(get("/rs/list/2"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.eventName").value("第二条事件"))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/3"))
-                .andExpect(content().string("第三条事件"))
+        mockMvc.perform(get("/rs/list/3"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.eventName").value("第三条事件"))
                 .andExpect(status().isOk());
 
     }
@@ -41,27 +53,45 @@ public class RsControllerTest {
     @Test
     void shouldGetRsEventBetween() throws Exception {
         mockMvc.perform(get("/rs/list?start=1&end=2"))
-                .andExpect(content().string("[第一条事件, 第二条事件]"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("无分类"))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list?start=2&end=3"))
-                .andExpect(content().string("[第二条事件, 第三条事件]"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[1].eventName").value("第三条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("无分类"))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list?start=1&end=3"))
-                .andExpect(content().string("[第一条事件, 第二条事件, 第三条事件]"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
+                .andExpect(jsonPath("$[2].keyWord").value("无分类"))
                 .andExpect(status().isOk());
 
     }
     @Test
     void shouldAddOneRsEvent() throws Exception{
-
-       mockMvc.perform(post("/rs/event").content("第四条事件")).andExpect(status().isOk());
-
-
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(content().string("[第一条事件, 第二条事件, 第三条事件, 第四条事件]"))
+       // String requestJson = "{\"eventName\":\"第四条事件\", \"keyWord\":\"无分类\"}";
+        RsEvent rsEvent = new RsEvent("第四条事件", "娱乐");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String body = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/list").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/4")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.eventName").value("第四条事件"))
+                .andExpect(jsonPath("$.keyWord").value("娱乐"));
 
     }
+
+
 
 
 }
