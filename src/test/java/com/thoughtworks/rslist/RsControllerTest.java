@@ -11,8 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -90,7 +89,26 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$.keyWord").value("娱乐"));
 
     }
+    @Test
+    void delete_one_event() throws Exception {
+        mockMvc.perform(delete("/rs/list/1")).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.eventName").value("第二条事件"))
+                .andExpect(jsonPath("$.keyWord").value("无分类"));
+    }
 
+
+    @Test
+    void modify_one_event() throws Exception {
+        RsEvent rsEvent = new RsEvent("A股高开低走", "财经");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String body = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/list/1").content(body).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/1"))
+                .andExpect(jsonPath("$.eventName").value("A股高开低走"))
+                .andExpect(jsonPath("$.keyWord").value("财经"))
+                .andExpect(status().isOk());
+    }
 
 
 

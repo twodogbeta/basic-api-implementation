@@ -23,4 +23,5 @@ public class RsEvent<eventName> {
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
     }
+
 }
