@@ -1,6 +1,8 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,34 +32,36 @@ public class RsController {
 
 
   @GetMapping("/rs/list/{index}")
-  public RsEvent getOneRsEvent(@PathVariable int index){
-    return rsList.get(index - 1);
+  public ResponseEntity<RsEvent> getOneRsEvent(@PathVariable int index){
+    return ResponseEntity.ok(rsList.get(index - 1));
   }
   @GetMapping("/rs/list")
-  public List<RsEvent> getList(@RequestParam(required = false) Integer start,
+  public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start,
                                   @RequestParam(required = false) Integer end){
     if (start == null && end == null){
-      return rsList;
+      return ResponseEntity.ok(rsList);
     }
-    return rsList.subList(start - 1,end);
+    return ResponseEntity.ok(rsList.subList(start - 1,end));
   }
-  @PostMapping("/rs/list")
-  public void addOneRsEvent(@RequestBody RsEvent rsEvent){
+  @PostMapping("/rs/event")
+  public ResponseEntity addOneRsEvent(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
+    return ResponseEntity.created(null).build();
   }
 
   @PutMapping("rs/list/{index}")
-  public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
-    rsList.set(index - 1, rsEvent);
+  public ResponseEntity modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
+    return ResponseEntity.ok(rsList.set(index - 1, rsEvent));
   }
   @DeleteMapping("rs/list/{index}")
-  public void deleteOneRsEvent(@PathVariable int index) {
-    rsList.remove(index - 1);
+  public ResponseEntity deleteOneRsEvent(@PathVariable int index) {
+   return ResponseEntity.ok(rsList.remove(index - 1));
   }
   @PostMapping("rs/justadd")
-  void justAddRsEventWhenHasUser(@RequestBody @Valid RsEvent rsEvent){
+  public ResponseEntity justAddRsEventWhenHasUser(@RequestBody @Valid RsEvent rsEvent){
       rsList.add(rsEvent);
       UserController.register(rsEvent.getUser());
+     return ResponseEntity.ok().build();
   }
 }
 

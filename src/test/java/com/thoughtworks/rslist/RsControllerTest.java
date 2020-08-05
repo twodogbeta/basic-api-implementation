@@ -89,10 +89,10 @@ public class RsControllerTest {
     void shouldAddOneRsEvent() throws Exception{
        // String requestJson = "{\"eventName\":\"第四条事件\", \"keyWord\":\"无分类\"}";
 
-        mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list/4")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.eventName").value("第四条事件"))
+                .andExpect(jsonPath("$.eventName").value("添加一条热搜"))
                 .andExpect(jsonPath("$.keyWord").value("娱乐"));
     }
 
@@ -100,8 +100,8 @@ public class RsControllerTest {
     void modifyOneEvent() throws Exception {
         mockMvc.perform(put("/rs/list/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/1"))
-                .andExpect(jsonPath("$.eventName").value("A股高开低走"))
-                .andExpect(jsonPath("$.keyWord").value("财经"))
+                .andExpect(jsonPath("$.eventName").value("添加一条热搜"))
+                .andExpect(jsonPath("$.keyWord").value("娱乐"))
                 .andExpect(status().isOk());
     }
 
