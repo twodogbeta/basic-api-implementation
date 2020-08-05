@@ -46,7 +46,6 @@ public class RsControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.eventName").value("第三条事件"))
                 .andExpect(status().isOk());
-
     }
 
     @Test
@@ -87,16 +86,7 @@ public class RsControllerTest {
         mockMvc.perform(get("/rs/list/4")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName").value("第四条事件"))
                 .andExpect(jsonPath("$.keyWord").value("娱乐"));
-
     }
-    @Test
-    void delete_one_event() throws Exception {
-        mockMvc.perform(delete("/rs/list/1")).andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list/1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.eventName").value("第二条事件"))
-                .andExpect(jsonPath("$.keyWord").value("无分类"));
-    }
-
 
     @Test
     void modify_one_event() throws Exception {
@@ -110,6 +100,13 @@ public class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-
+    @Test
+    void delete_one_event() throws Exception {
+        mockMvc.perform(delete("/rs/list/2")).andExpect(status().isOk());
+        mockMvc.perform(get("/rs/list/2"))
+                .andExpect(jsonPath("$.eventName").value("第三条事件"))
+                .andExpect(jsonPath("$.keyWord").value("无分类"))
+                .andExpect(status().isOk());
+    }
 
 }
