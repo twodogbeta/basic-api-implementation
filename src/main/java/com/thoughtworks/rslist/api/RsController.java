@@ -3,18 +3,53 @@ package com.thoughtworks.rslist.api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import com.thoughtworks.rslist.domain.RsEvent;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 
 public class RsController {
-  private static List<String> rsList = Arrays.asList("第一条事件", "第二条事件", "第三条事件");
-  @GetMapping("/rs/list")
-  public String getList(){
-    return rsList.toString();
+  private  List<RsEvent> rsList = initRsEvent();
+  private List<RsEvent>  initRsEvent(){
+    List<RsEvent> result = new ArrayList<>();
+    result.add(new RsEvent("第一条事件","无分类"));
+    result.add(new RsEvent("第二条事件","无分类"));
+    result.add(new RsEvent("第三条事件","无分类"));
+    return result;
   }
 
+
+  @GetMapping("/rs/list/{index}")
+  public RsEvent getOneRsEvent(@PathVariable int index){
+    return rsList.get(index - 1);
+  }
+  @GetMapping("/rs/list")
+  public List<RsEvent> getList(@RequestParam(required = false) Integer start,
+                                  @RequestParam(required = false) Integer end){
+    if (start == null && end == null){
+      return rsList;
+    }
+    return rsList.subList(start - 1,end);
+  }
+  @PostMapping("/rs/list")
+  public void addOneRsEvent(@RequestBody RsEvent rsEvent){
+    rsList.add(rsEvent);
+  }
+
+  @PutMapping("rs/list/{index}")
+  public void modifyOneRsEvent(@PathVariable int index, @RequestBody RsEvent rsEvent) {
+    rsList.set(index - 1, rsEvent);
+  }
+  @DeleteMapping("rs/list/{index}")
+  public void deleteOneRsEvent(@PathVariable int index) {
+    rsList.remove(index - 1);
+  }
 }
 
 
