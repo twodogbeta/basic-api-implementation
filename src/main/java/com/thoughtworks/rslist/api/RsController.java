@@ -14,8 +14,5 @@ public class RsController {
   public String getList(){
     return rsList.toString();
   }
-  public void addOneRsEvent(@RequestBody String rsEvent){
-    rsList.add(rsEvent);
-  }
 
 }
