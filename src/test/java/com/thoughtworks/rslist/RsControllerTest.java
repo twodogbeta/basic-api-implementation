@@ -1,24 +1,34 @@
 package com.thoughtworks.rslist;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.api.RsController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class RsControllerTest {
     @Autowired
     MockMvc mockMvc;
+    String requestBody;
+   public RsControllerTest() {
+       requestBody = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"xiaowang\",\"age\": 19,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
+    }
+    @BeforeEach
+    void setUp(){
+        RsController.initRsEvent();
+    }
     @Test
     void shouldGetRsList() throws Exception{
         mockMvc.perform(get("/rs/list"))
@@ -78,10 +88,8 @@ public class RsControllerTest {
     @Test
     void shouldAddOneRsEvent() throws Exception{
        // String requestJson = "{\"eventName\":\"第四条事件\", \"keyWord\":\"无分类\"}";
-        RsEvent rsEvent = new RsEvent("第四条事件", "娱乐");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String body = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/list").content(body).contentType(MediaType.APPLICATION_JSON))
+
+        mockMvc.perform(post("/rs/list").content(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/4")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName").value("第四条事件"))
@@ -89,11 +97,8 @@ public class RsControllerTest {
     }
 
     @Test
-    void modify_one_event() throws Exception {
-        RsEvent rsEvent = new RsEvent("A股高开低走", "财经");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String body = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(put("/rs/list/1").content(body).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+    void modifyOneEvent() throws Exception {
+        mockMvc.perform(put("/rs/list/1").content(requestBody).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/1"))
                 .andExpect(jsonPath("$.eventName").value("A股高开低走"))
                 .andExpect(jsonPath("$.keyWord").value("财经"))
@@ -101,7 +106,7 @@ public class RsControllerTest {
     }
 
     @Test
-    void delete_one_event() throws Exception {
+    void deleteOneEvent() throws Exception {
         mockMvc.perform(delete("/rs/list/2")).andExpect(status().isOk());
         mockMvc.perform(get("/rs/list/2"))
                 .andExpect(jsonPath("$.eventName").value("第三条事件"))
@@ -109,4 +114,6 @@ public class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-}
+    }
+
+

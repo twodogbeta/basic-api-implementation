@@ -1,11 +1,13 @@
 package com.thoughtworks.rslist.api;
 
+import com.thoughtworks.rslist.domain.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import com.thoughtworks.rslist.domain.RsEvent;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,13 +17,15 @@ import java.util.stream.Stream;
 @RestController
 
 public class RsController {
-  private  List<RsEvent> rsList = initRsEvent();
-  private List<RsEvent>  initRsEvent(){
-    List<RsEvent> result = new ArrayList<>();
-    result.add(new RsEvent("第一条事件","无分类"));
-    result.add(new RsEvent("第二条事件","无分类"));
-    result.add(new RsEvent("第三条事件","无分类"));
-    return result;
+
+  private static final List<RsEvent> rsList = new ArrayList<>();
+
+  public static void  initRsEvent(){
+    rsList.clear();
+    User user = new User("Tom", "male", 40, "tom@gmail.com", "15800000000");
+    rsList.add(new RsEvent("第一条事件","无分类",user));
+    rsList.add(new RsEvent("第二条事件","无分类",user));
+    rsList.add(new RsEvent("第三条事件","无分类",user));
   }
 
 
@@ -49,6 +53,11 @@ public class RsController {
   @DeleteMapping("rs/list/{index}")
   public void deleteOneRsEvent(@PathVariable int index) {
     rsList.remove(index - 1);
+  }
+  @PostMapping("rs/justadd")
+  void justAddRsEventWhenHasUser(@RequestBody @Valid RsEvent rsEvent){
+      rsList.add(rsEvent);
+      UserController.register(rsEvent.getUser());
   }
 }
 
