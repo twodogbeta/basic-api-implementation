@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thoughtworks.rslist.domain.RsEvent;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.StringValueExp;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,10 +26,10 @@ public class RsController {
 
   public static void  initRsEvent(){
     rsList.clear();
-    User user = new User("Tom", "male", 40, "tom@gmail.com", "15800000000");
-    rsList.add(new RsEvent("第一条事件","无分类",user));
-    rsList.add(new RsEvent("第二条事件","无分类",user));
-    rsList.add(new RsEvent("第三条事件","无分类",user));
+    User user1 = new User("Tom", "male", 40, "tom@gmail.com", "15800000000");
+    rsList.add(new RsEvent("第一条事件","无分类",user1));
+    rsList.add(new RsEvent("第二条事件","无分类",user1));
+    rsList.add(new RsEvent("第三条事件","无分类",user1));
   }
 
 
@@ -46,7 +48,9 @@ public class RsController {
   @PostMapping("/rs/event")
   public ResponseEntity addOneRsEvent(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
-    return ResponseEntity.created(null).build();
+    String headers = String.valueOf(rsList.indexOf(rsEvent));
+   // return new ResponseEntity("null",headers, HttpStatus.CREATED);
+    return ResponseEntity.created(URI.create(headers)).build();
   }
 
   @PutMapping("rs/list/{index}")
