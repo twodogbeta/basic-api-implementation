@@ -28,10 +28,12 @@ public class RsController {
 
     public static void initRsEvent() {
         rsList.clear();
-        User user1 = new User("Tom", "male", 40, "tom@gmail.com", "15800000000");
+        UserController.userList.clear();
+        User user1 = new User("pop", "male", 40, "tom@gmail.com", "15800000000");
         rsList.add(new RsEvent("第一条事件", "无分类", user1));
         rsList.add(new RsEvent("第二条事件", "无分类", user1));
         rsList.add(new RsEvent("第三条事件", "无分类", user1));
+        UserController.userList.add(user1);
     }
 
 
@@ -43,6 +45,7 @@ public class RsController {
     @GetMapping("/rs/list")
     public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start,
                                                  @RequestParam(required = false) Integer end) {
+
         if (start == null && end == null) {
             return ResponseEntity.ok(rsList);
         }
@@ -50,19 +53,20 @@ public class RsController {
     }
 
     @PostMapping("/rs/event")
-    public ResponseEntity addOneRsEvent(@RequestBody @Validated RsEvent rsEvent) {
+    public ResponseEntity addOneRsEvent(@RequestBody @Valid RsEvent rsEvent) {
+
+
         for (User u : UserController.userList) {
-            if (u.getName() == rsEvent.getUser().getName())
-                rsList.add(rsEvent);
-            String headers = String.valueOf(rsList.indexOf(rsEvent));
-            // return new ResponseEntity("null",headers, HttpStatus.CREATED);
-            return ResponseEntity.created(URI.create(headers)).build();
+            if (String.valueOf(u.getName()) == String.valueOf(rsEvent.getUser().getName())) {
+                String headers = String.valueOf(rsList.indexOf(rsEvent));
+                return ResponseEntity.created(URI.create(headers)).build();
+            }
         }
         rsList.add(rsEvent);
         UserController.userList.add(rsEvent.getUser());
         String headers = String.valueOf(rsList.indexOf(rsEvent));
-        // return new ResponseEntity("null",headers, HttpStatus.CREATED);
         return ResponseEntity.created(URI.create(headers)).build();
+
 
     }
 

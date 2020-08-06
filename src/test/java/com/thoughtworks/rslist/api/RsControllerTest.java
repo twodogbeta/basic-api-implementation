@@ -103,7 +103,7 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$.user.gender").value("female"))
                 .andExpect(jsonPath("$.user.email").value("a@thoughtworks.com"))
                 .andExpect(jsonPath("$.user.phone").value("18888888888"))*/
-                .andExpect(jsonPath("$.user",hasKey("user")))
+                .andExpect(jsonPath("$",hasKey("user")))
                 .andExpect(status().isOk());
     }
 
@@ -127,23 +127,32 @@ public class RsControllerTest {
 
     @Test
     void shouldJustAddRsEventWhenUserNameExist() throws Exception {
-        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-        Assertions.assertEquals(4,RsController.rsList.size());
-        Assertions.assertEquals(0,UserController.userList.size());
-    }
-    @Test
-    void shouldAddUserIntoUserListWhenUserNameNotExist() throws Exception {
-        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+        String requestBody1 = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"pop\",\"age\": 19,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
+        mockMvc.perform(post("/rs/event").content(requestBody1).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         Assertions.assertEquals(4,RsController.rsList.size());
         Assertions.assertEquals(1,UserController.userList.size());
+    }
+    @Test
+    void shouldAddUserIntoUserListWhenUserNameNotExist() throws Exception {
+        String requestBody2 = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"Lucy\",\"age\": 19,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
+        mockMvc.perform(post("/rs/event").content(requestBody2).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        Assertions.assertEquals(4,RsController.rsList.size());
+        Assertions.assertEquals(2,UserController.userList.size());
     }
 
     @Test
     void allpostRequestShouldReturn201InRsController() throws Exception {
         mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void shouldReturnNotHasUserWhenGetRsList() throws Exception {
+       mockMvc.perform(get("/rs/list"))
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$[0]",not(hasKey("user"))));
     }
 
     }
