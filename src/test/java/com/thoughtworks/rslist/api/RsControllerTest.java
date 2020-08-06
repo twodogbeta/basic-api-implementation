@@ -140,6 +140,12 @@ public class RsControllerTest {
         Assertions.assertEquals(1,UserController.userList.size());
     }
 
+    @Test
+    void allpostRequestShouldReturn201InRsController() throws Exception {
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
     }
 
 
