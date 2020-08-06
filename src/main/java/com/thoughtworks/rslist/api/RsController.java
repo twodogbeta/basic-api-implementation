@@ -57,7 +57,8 @@ public class RsController {
 
 
         for (User u : UserController.userList) {
-            if (String.valueOf(u.getName()) == String.valueOf(rsEvent.getUser().getName())) {
+            if (u.getName().equals(rsEvent.getUser().getName())) {
+                rsList.add(rsEvent);
                 String headers = String.valueOf(rsList.indexOf(rsEvent));
                 return ResponseEntity.created(URI.create(headers)).build();
             }
