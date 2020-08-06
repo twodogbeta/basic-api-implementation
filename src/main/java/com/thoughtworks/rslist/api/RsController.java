@@ -76,12 +76,6 @@ public class RsController {
         return ResponseEntity.ok(rsList.remove(index - 1));
     }
 
-    @PostMapping("rs/justadd")
-    public ResponseEntity justAddRsEventWhenHasUser(@RequestBody @Valid RsEvent rsEvent) {
-        rsList.add(rsEvent);
-        UserController.register(rsEvent.getUser());
-        return ResponseEntity.ok().build();
-    }
 }
 
 
