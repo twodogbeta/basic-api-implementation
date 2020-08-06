@@ -15,15 +15,14 @@ import java.util.Set;
 @RestController
 public class UserController {
 
-    public static  Set<User> usersSet = new HashSet<>();
+    public static List<User> userList = new ArrayList<>();
 
     @PostMapping("/user")
-    public static ResponseEntity register(@RequestBody @Valid User user){
-        if (!usersSet.contains(user))
-            return ResponseEntity.ok(usersSet.add(user));
-        return ResponseEntity.ok().build();
+    public static ResponseEntity register(@RequestBody @Valid User user) {
+        for (User u : userList) {
+            if (u.getName() == user.getName())
+                return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.ok(userList.add(user));
     }
-
-
-
 }

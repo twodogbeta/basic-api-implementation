@@ -1,6 +1,7 @@
-package com.thoughtworks.rslist;
+package com.thoughtworks.rslist.api;
 
-import com.thoughtworks.rslist.api.RsController;
+import com.thoughtworks.rslist.domain.RsEvent;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.not;
+
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,9 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RsControllerTest {
     @Autowired
     MockMvc mockMvc;
+
     String requestBody;
    public RsControllerTest() {
-       requestBody = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"xiaowang\",\"age\": 19,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
+       requestBody = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"Tom\",\"age\": 19,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
     }
     @BeforeEach
     void setUp(){
@@ -81,7 +83,8 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("无分类"))
                 .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
-                .andExpect(jsonPath("$[2].keyWord").value("无分类"))
+               // .andExpect(jsonPath("$[2].keyWord").value("无分类"))
+                .andExpect(jsonPath("$[2].keyWord",is("无分类")))
                 .andExpect(status().isOk());
 
     }
@@ -120,6 +123,21 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$.eventName").value("第三条事件"))
                 .andExpect(jsonPath("$.keyWord").value("无分类"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldJustAddRsEventWhenUserNameExist() throws Exception {
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        Assertions.assertEquals(4,RsController.rsList.size());
+        Assertions.assertEquals(0,UserController.userList.size());
+    }
+    @Test
+    void shouldAddUserIntoUserListWhenUserNameNotExist() throws Exception {
+        mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        Assertions.assertEquals(4,RsController.rsList.size());
+        Assertions.assertEquals(1,UserController.userList.size());
     }
 
     }

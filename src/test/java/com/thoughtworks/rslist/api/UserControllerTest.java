@@ -23,7 +23,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp(){
-        UserController.usersSet.clear();
+        UserController.userList.clear();
     }
 
     @Test
@@ -33,7 +33,7 @@ class UserControllerTest {
         String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        assertEquals(1,UserController.usersSet.size());
+        assertEquals(1,UserController.userList.size());
     }
     @Test
     void nameShouldNotNull() throws Exception {
