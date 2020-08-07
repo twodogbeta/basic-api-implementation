@@ -155,6 +155,12 @@ public class RsControllerTest {
                .andExpect(jsonPath("$[0]",not(hasKey("user"))));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenIndexOutOfBound() throws Exception {
+       mockMvc.perform(get("/rs/list/10"))
+               .andExpect(jsonPath("$.error", is("invalid index")));
+    }
+
     }
 
 
