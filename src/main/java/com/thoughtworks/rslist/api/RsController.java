@@ -85,31 +85,6 @@ public class RsController {
         return ResponseEntity.ok(rsList.remove(index - 1));
     }
 
-    @ExceptionHandler({InvalidIndexException.class, MethodArgumentNotValidException.class})
-    public ResponseEntity exceptionHandler (Exception ex){
-        String errorMessage ;
-        CommonError commonError = new CommonError();
-        if (ex instanceof  MethodArgumentNotValidException)
-            errorMessage  = "invalid param";
-        else  errorMessage = ex.getMessage();
-        commonError.setError(errorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
-    }
-
-
-/*    @ExceptionHandler(InvalidIndexException.class)
-    public ResponseEntity exceptionHandler (InvalidIndexException ex){
-        CommonError commonError = new CommonError();
-        commonError.setError(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity exceptionHandler1 (MethodArgumentNotValidException ex){
-        CommonError commonError = new CommonError();
-        commonError.setError("invalid param");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
-    }*/
 
 }
 
