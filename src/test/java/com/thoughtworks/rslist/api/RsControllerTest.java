@@ -161,6 +161,12 @@ public class RsControllerTest {
                .andExpect(jsonPath("$.error", is("invalid index")));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenIndexOutOfBoun() throws Exception {
+        mockMvc.perform(get( "/rs/list?start=8&end=2"))
+                .andExpect(jsonPath("$.error", is("invalid request param")));
+    }
+
     }
 
 

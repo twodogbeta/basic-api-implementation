@@ -3,6 +3,7 @@ package com.thoughtworks.rslist.api;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.InvalidIndexException;
+import com.thoughtworks.rslist.utils.ListOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,12 +52,16 @@ public class RsController {
 
     @GetMapping("/rs/list")
     public ResponseEntity<List<RsEvent>> getList(@RequestParam(required = false) Integer start,
-                                                 @RequestParam(required = false) Integer end) {
+                                                 @RequestParam(required = false) Integer end) throws InvalidIndexException {
 
-        if (start == null && end == null) {
-            return ResponseEntity.ok(rsList);
-        }
-        return ResponseEntity.ok(rsList.subList(start - 1, end));
+
+            if (ListOperation.isLegalIndex(start,end,rsList))
+                return ResponseEntity.ok(rsList.subList(start - 1, end));
+            else if (start == null && end == null){
+                return ResponseEntity.ok(rsList);
+            }
+            throw new InvalidIndexException("invalid request param");
+
     }
 
     @PostMapping("/rs/event")
@@ -74,8 +79,6 @@ public class RsController {
         UserController.userList.add(rsEvent.getUser());
         String headers = String.valueOf(rsList.indexOf(rsEvent));
         return ResponseEntity.created(URI.create(headers)).build();
-
-
     }
 
     @PutMapping("rs/list/{index}")
