@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,7 +144,10 @@ public class RsControllerTest {
     }
 
     @Test
-    void allpostRequestShouldReturn201InRsController() throws Exception {
+    void allPostRequestShouldReturn201InRsController() throws Exception {
+      /* RsEvent rsEvent = new RsEvent("事件一","经济",null);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String eventJson = objectMapper.writeValueAsString(rsEvent);*/
         mockMvc.perform(post("/rs/event").content(requestBody).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
@@ -165,6 +169,14 @@ public class RsControllerTest {
     void shouldReturnBadRequestWhenIndexOutOfBoun() throws Exception {
         mockMvc.perform(get( "/rs/list?start=8&end=2"))
                 .andExpect(jsonPath("$.error", is("invalid request param")));
+    }
+    @Test
+    void shouldReturnExceptionWhenOneEventValidUser() throws Exception {
+        String requestBody1 = "{\"eventName\":\"添加一条热搜\",\"keyWord\":\"娱乐\",\"user\": {\"name\":\"pop\",\"age\": 2,\"gender\": \"female\",\"email\": \"a@thoughtworks.com\",\"phone\": \"18888888888\"}}";
+        mockMvc.perform(post("/rs/event").content(requestBody1).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error",is("invalid param")))
+                .andExpect(status().isBadRequest());
+
     }
 
     }

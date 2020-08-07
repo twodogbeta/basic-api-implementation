@@ -82,6 +82,7 @@ class UserControllerTest {
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+    @Test
     void phoneNumberShouldValid() throws Exception {
         User user = new User("Jim", "male", 19, "qijinhaoup@163.com", "1383232366232");
         ObjectMapper objectMapper = new ObjectMapper();
