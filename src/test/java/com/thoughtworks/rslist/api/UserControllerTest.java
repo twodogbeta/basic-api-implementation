@@ -38,7 +38,7 @@ class UserControllerTest {
         String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-        assertEquals(1,UserController.userList.size());
+        assertEquals(3,UserController.userList.size());
     }
     @Test
     void nameShouldNotNull() throws Exception {

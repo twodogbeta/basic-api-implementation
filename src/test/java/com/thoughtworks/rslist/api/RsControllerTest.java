@@ -97,11 +97,6 @@ public class RsControllerTest {
         mockMvc.perform(get("/rs/list/4"))
                 .andExpect(jsonPath("$.eventName").value("添加一条热搜"))
                 .andExpect(jsonPath("$.keyWord").value("娱乐"))
-               /* .andExpect(jsonPath("$.user.name").value("xiaowang"))
-                .andExpect(jsonPath("$.user.age").value(19))
-                .andExpect(jsonPath("$.user.gender").value("female"))
-                .andExpect(jsonPath("$.user.email").value("a@thoughtworks.com"))
-                .andExpect(jsonPath("$.user.phone").value("18888888888"))*/
                 .andExpect(jsonPath("$",hasKey("user")))
                 .andExpect(status().isOk());
     }
